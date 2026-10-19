@@ -1,0 +1,21 @@
+# TEMPLATE ONLY: publish to the synthetic canary during the approved live test.
+# Use a reviewed, protected branch and record this file's Git blob SHA in its manifest.
+name: Freestyle queued-runner canary
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  parallel:
+    strategy:
+      fail-fast: false
+      matrix:
+        task: [one, two, three]
+    runs-on: [self-hosted, linux, x64, ci-freestyle]
+    timeout-minutes: 25
+    steps:
+      - name: Synthetic overlap check
+        run: |
+          echo "Task ${{ matrix.task }} starting"
+          sleep 15
+          echo "Task ${{ matrix.task }} finished"
