@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         task: [one, two, three]
-    runs-on: [self-hosted, linux, x64, ci-freestyle]
+    runs-on: [self-hosted, linux, x64, ci-freestyle-${{ matrix.slot }}]
     timeout-minutes: 25
     steps:
       - name: Synthetic overlap check
