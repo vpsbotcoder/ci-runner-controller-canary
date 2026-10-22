@@ -1,21 +1,33 @@
-# TEMPLATE ONLY: publish to the synthetic canary during the approved live test.
-# Use a reviewed, protected branch and record this file's Git blob SHA in its manifest.
-name: Freestyle queued-runner canary
+name: GURU direct six-runner canary
 on:
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  parallel:
+  direct:
     strategy:
       fail-fast: false
       matrix:
-        task: [one, two, three]
-    runs-on: [self-hosted, linux, x64, 'ci-freestyle-${{ matrix.slot }}']
-    timeout-minutes: 25
+        include:
+          - {slot: 1, profile: ci-large}
+          - {slot: 2, profile: ci-large}
+          - {slot: 3, profile: ci-large}
+          - {slot: 4, profile: ci-large}
+          - {slot: 5, profile: ci-small}
+          - {slot: 6, profile: ci-small}
+    runs-on: [self-hosted, Linux, X64, ci-guru-direct-canary, '${{ matrix.profile }}']
+    timeout-minutes: 10
     steps:
-      - name: Synthetic overlap check
+      - name: Verify direct user, Docker and simultaneous execution
+        shell: bash
         run: |
-          echo "Task ${{ matrix.task }} starting"
-          sleep 15
-          echo "Task ${{ matrix.task }} finished"
+          set -euo pipefail
+          test "$(id -u)" -ne 0
+          id -un | grep -Eq '^ci-guru-[1-6]$'
+          test ! -r /home/debian/.config/doppler/main_cloud.token
+          test ! -r /home/debian/.ssh/goozoo
+          docker version --format '{{.Server.Version}}'
+          test -w "$GITHUB_WORKSPACE"
+          echo "started $(date -u +%FT%TZ) $(id -un)"
+          sleep 90
+          echo "finished $(date -u +%FT%TZ)"
