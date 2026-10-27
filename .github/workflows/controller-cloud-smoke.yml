@@ -1,0 +1,20 @@
+name: Automatic controller cloud fallback smoke
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: [self-hosted, Linux, X64, ci-cloud-fallback-smoke]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify automatic runner and toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -w "$GITHUB_WORKSPACE"
+          node -e 'if (Number(process.versions.node.split(".")[0]) !== 22) process.exit(1); console.log("automatic-controller-smoke-ok")'
