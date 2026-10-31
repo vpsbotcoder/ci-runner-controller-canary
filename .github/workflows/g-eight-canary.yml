@@ -1,0 +1,23 @@
+name: Replacement host eight-runner canary
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        slot: [1, 2, 3, 4, 5, 6, 7, 8]
+    runs-on: [self-hosted, Linux, X64, ci-host-g]
+    timeout-minutes: 10
+    steps:
+      - name: Verify host, Docker and concurrency
+        shell: bash
+        run: |
+          set -euo pipefail
+          id -un | grep -Eq '^ci-g-[1-8]$'
+          docker version --format '{{.Server.Version}}'
+          echo "started $(date -u +%FT%TZ) $(id -un)"
+          sleep 120
+          echo "finished $(date -u +%FT%TZ)"
