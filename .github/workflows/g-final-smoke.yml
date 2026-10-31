@@ -1,0 +1,20 @@
+name: Replacement host final smoke
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: [self-hosted, Linux, X64, ci-host-g]
+    timeout-minutes: 5
+    steps:
+      - name: Verify runner and limits
+        shell: bash
+        run: |
+          set -euo pipefail
+          id -un | grep -Eq '^ci-g-[1-8]$'
+          docker version --format '{{.Server.Version}}'
+          group="$(awk -F: '$1 == "0" {print $3}' /proc/self/cgroup)"
+          test "$(cat "/sys/fs/cgroup${group}/memory.max")" = max
+          test "$(cat "/sys/fs/cgroup${group}/pids.max")" = max
+          test "$(cat "/sys/fs/cgroup${group}/cpu.max")" = 'max 100000'
