@@ -5,7 +5,7 @@ permissions:
   contents: read
 jobs:
   smoke:
-    runs-on: [self-hosted, Linux, X64, ci-host-guru, ci-small]
+    runs-on: [self-hosted, Linux, X64, ci-host-g, ci-small]
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -16,6 +16,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          id -un | grep -Eq '^ci-guru-[56]$'
+          id -un | grep -Eq '^ci-g-[1-8]$'
           test -w "$GITHUB_WORKSPACE"
           node -e 'if (Number(process.versions.node.split(".")[0]) !== 22) process.exit(1); console.log("automatic-controller-smoke-ok")'
