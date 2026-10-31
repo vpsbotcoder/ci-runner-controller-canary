@@ -1,4 +1,4 @@
-name: GURU four-heavy two-small acceptance
+name: Direct memory and Docker acceptance
 on:
   workflow_dispatch:
 permissions:
@@ -15,7 +15,7 @@ jobs:
           - {slot: 4, profile: ci-large}
           - {slot: 5, profile: ci-small}
           - {slot: 6, profile: ci-small}
-    runs-on: [self-hosted, Linux, X64, ci-host-guru, '${{ matrix.profile }}']
+    runs-on: [self-hosted, Linux, X64, ci-host-g, '${{ matrix.profile }}']
     timeout-minutes: 10
     steps:
       - name: Verify direct user and Docker build
@@ -23,13 +23,12 @@ jobs:
         run: |
           set -euo pipefail
           test "$(id -u)" -ne 0
-          id -un | grep -Eq '^ci-guru-[1-6]$'
-          test ! -r /home/debian/.config/doppler/main_cloud.token
-          test ! -r /home/debian/.ssh/goozoo
+          id -un | grep -Eq '^ci-g-[1-8]$'
+          test ! -r /etc/ci-runner-controller/doppler-token
           mkdir -p "$RUNNER_TEMP/synthetic-build"
           printf 'runner-smoke\n' > "$RUNNER_TEMP/synthetic-build/payload"
           printf 'FROM scratch\nCOPY payload /payload\n' > "$RUNNER_TEMP/synthetic-build/Dockerfile"
-          tag="ci-guru-acceptance:${{ github.run_id }}-${{ matrix.slot }}"
+          tag="ci-g-acceptance:${{ github.run_id }}-${{ matrix.slot }}"
           trap 'docker image rm "$tag" >/dev/null 2>&1 || true' EXIT
           docker build --quiet --tag "$tag" "$RUNNER_TEMP/synthetic-build"
       - name: Exercise memory and simultaneous slots
