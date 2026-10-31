@@ -1,0 +1,16 @@
+name: Legacy host label compatibility
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: [self-hosted, Linux, X64, ci-host-guru]
+    timeout-minutes: 5
+    steps:
+      - name: Verify replacement host
+        shell: bash
+        run: |
+          set -euo pipefail
+          id -un | grep -Eq '^ci-g-[1-8]$'
+          docker version --format '{{.Server.Version}}'
